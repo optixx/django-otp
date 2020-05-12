@@ -23,15 +23,18 @@ class OTPMiddleware(object):
     verified.  As a convenience, this also installs ``user.is_verified()``,
     which returns ``True`` if ``user.otp_device`` is not ``None``.
     """
-    def __init__(self, get_response=None):
-        self.get_response = get_response
-
-    def __call__(self, request):
+    """
+    Note:
+    file patched to use 'old' style middleware syntax,
+    so that it can be used in MIDDLEWARE_CLASSES in settings.
+    Original file is found in django-otp repo: https://github.com/django-otp/django-otp/blob/v0.7.5/src/django_otp/middleware.py
+    """
+    def process_request(self, request):
         user = getattr(request, 'user', None)
         if user is not None:
             request.user = SimpleLazyObject(functools.partial(self._verify_user, request, user))
 
-        return self.get_response(request)
+        return None
 
     def _verify_user(self, request, user):
         """
